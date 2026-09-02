@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ROBLOX Games</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .games-container { display: flex; gap: 15px; margin-top: 10px; }
+    .games-sidebar { width: 140px; font-size: 11px; }
+    .games-sidebar ul { list-style: none; padding: 0; }
+    .games-sidebar li { margin-bottom: 5px; }
+    .games-sidebar a { color: #0000ee; text-decoration: none; }
+    .games-sidebar .active { font-weight: bold; color: #000; }
+    .games-grid-area { flex: 1; }
+    .games-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 10px; }
+    .game-card { font-size: 10px; }
+    .game-thumb { width: 100%; height: 110px; border: 1px solid #000; object-fit: cover; display: block; }
+    .game-title { font-weight: bold; color: #0000ee; text-decoration: none; display: block; margin: 4px 0 2px 0; font-size: 11px; }
+    .game-meta { color: #333; line-height: 1.2; }
+    .online-count { color: #cc0000; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    
+    <!-- Topo -->
+    <header class="header-banner">
+      <div class="login-badge">Login</div>
+      <div class="logo-area">
+        <h1 class="logo">RÔBLOX</h1>
+        <span class="slogan">Think.<br>Create.</span>
+      </div>
+      <a href="#" class="play-now-btn">PLAY NOW</a>
+    </header>
+
+    <!-- Nav -->
+    <nav class="navbar">
+      <a href="index.html">My ROBLOX</a> |
+      <a href="games.html">Games</a> |
+      <a href="#">Catalog</a> |
+      <a href="#">People</a> |
+      <a href="#">Builders Club</a> |
+      <a href="#">Forum</a> |
+      <a href="#">News</a> |
+      <a href="#">Parents</a> |
+      <a href="#">Help</a>
+    </nav>
+
+    <!-- Games Layout -->
+    <main class="games-container">
+      <aside class="games-sidebar">
+        <strong>Browse</strong>
+        <ul>
+          <li><a href="#" class="active">■ Most Popular</a></li>
+          <li><a href="#">Top Favorites</a></li>
+          <li><a href="#">Recently Updated</a></li>
+          <li><a href="#">Featured Games</a></li>
+        </ul>
+        <br>
+        <strong>Time</strong>
+        <ul>
+          <li><a href="#" class="active">■ Now</a></li>
+          <li><a href="#">Past Day</a></li>
+          <li><a href="#">Past Week</a></li>
+          <li><a href="#">All-time</a></li>
+        </ul>
+      </aside>
+
+      <section class="games-grid-area">
+        <h2 style="font-size: 16px; font-weight: bold;">Games</h2>
+        <div class="games-grid" id="games-list">
+          <!-- Carregado via JS do games.json -->
+        </div>
+      </section>
+    </main>
+
+  </div>
+
+  <script>
+    async function loadGames() {
+      try {
+        const response = await fetch('/public/games.json');
+        const games = await response.json();
+        const container = document.getElementById('games-list');
+
+        container.innerHTML = games.map(game => `
+          <div class="game-card">
+            <a href="client.html?id=${game.id}">
+              <img src="public/map/${game.id}/map.png" onerror="this.src='https://via.placeholder.com/150'" class="game-thumb" alt="${game.title}">
+            </a>
+            <a href="client.html?id=${game.id}" class="game-title">${game.title}</a>
+            <div class="game-meta">
+              <strong>Updated:</strong> ${game.updated}<br>
+              <strong>Creator:</strong> <a href="#">${game.creator}</a><br>
+              <strong>Favorited:</strong> ${game.favorited} times<br>
+              <strong>Played:</strong> ${game.played} times<br>
+              <span class="online-count">${game.online} players online</span>
+            </div>
+          </div>
+        `).join('');
+      } catch (err) {
+        console.error("Erro ao carregar os jogos:", err);
+      }
+    }
+
+    loadGames();
+  </script>
+
+</body>
+</html>

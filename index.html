@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ROBLOX: A Virtual Building Toy & Free Build Site</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Trilha Sonora da Tela Inicial -->
+  <audio autoplay loop id="bg-music">
+    <source src="public/better-off-alone.mp3" type="audio/mpeg">
+  </audio>
+
+  <div class="container">
+    
+    <!-- Topo / Header -->
+    <header class="header-banner">
+      <div class="login-badge">
+        <span>Login</span>
+      </div>
+      <div class="logo-area">
+        <h1 class="logo">RÔBLOX</h1>
+        <span class="slogan">Think.<br>Create.</span>
+      </div>
+      <a href="#" class="play-now-btn">PLAY NOW</a>
+    </header>
+
+    <!-- Barra de Navegação -->
+    <nav class="navbar">
+      <a href="#">My ROBLOX</a> |
+      <a href="games">Games</a> |
+      <a href="#">Catalog</a> |
+      <a href="#">People</a> |
+      <a href="#">Builders Club</a> |
+      <a href="#">Forum</a> |
+      <a href="#">News <img src="https://web.archive.org/web/20080701000000im_/http://www.roblox.com/images/rss.png" alt="RSS" class="rss-icon"></a> |
+      <a href="#">Parents</a> |
+      <a href="#">Help</a>
+    </nav>
+
+    <!-- Conteúdo Principal -->
+    <main class="main-content">
+      
+      <!-- Painel Esquerdo (Login & Avatar) -->
+      <aside class="sidebar-left">
+        <div class="login-box">
+          <div class="box-header">Member Login</div>
+          <form class="login-form">
+            <label>Character Name</label>
+            <input type="text" name="username">
+            <label>Password</label>
+            <input type="password" name="password">
+            <button type="submit" class="login-btn">Login</button>
+            <a href="#" class="forgot-pwd">Forgot your password?</a>
+          </form>
+        </div>
+
+        <div class="avatar-preview">
+          <img src="public/avatar.png" alt="ROBLOX Avatar" class="avatar-img">
+        </div>
+      </aside>
+
+      <!-- Painel Central (Apresentação & Player Flash) -->
+      <section class="center-content">
+        <div class="intro-header">
+          <h2>ROBLOX Virtual Playworld</h2>
+          <p class="subtitle">ROBLOX is Free!</p>
+        </div>
+
+        <div class="content-body">
+          <div class="features-list">
+            <div class="feature-item">
+              <img src="public/load//icon-build.png" alt="Build">
+              <div>
+                <strong>Build your personal Place</strong>
+                <p>Create buildings, vehicles, scenery, and traps with thousands of virtual bricks.</p>
+              </div>
+            </div>
+
+            <div class="feature-item">
+              <img src="public/load/icon-friends.png" alt="Friends">
+              <div>
+                <strong>Meet new friends online</strong>
+                <p>Visit your friend's place, chat in 3D, and build together.</p>
+              </div>
+            </div>
+
+            <div class="feature-item">
+              <img src="public/load/icon-battle.png" alt="Battle">
+              <div>
+                <strong>Battle in the Brick Arenas</strong>
+                <p>Play with the slingshot, rocket, or other brick battle tools. Be careful not to get "bloxxed".</p>
+              </div>
+            </div>
+
+            <div class="kid-safe-badge">
+              <div class="badge-text">
+                <strong>Kid Safe</strong>
+                <span>This website is COPPA compliant</span>
+              </div>
+              <a href="#" class="parents-btn">Parents Click Here</a>
+            </div>
+            <div class="windows-tag">Works with your Windows PC!</div>
+          </div>
+
+          <!-- Video Player em Flash Nativo (public/load/video1.swf) -->
+          <div class="media-container">
+            <object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" width="320" height="260" id="flash-video">
+              <param name="movie" value="public/video1.swf" />
+              <param name="quality" value="high" />
+              <param name="bgcolor" value="#ffffff" />
+              <param name="allowScriptAccess" value="always" />
+              <embed src="public/load/video1.swf" quality="high" bgcolor="#ffffff" width="320" height="260" name="flash-video" align="middle" play="true" loop="false" quality="high" allowScriptAccess="always" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" />
+            </object>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Seção Cool Places (Lugares em Destaque) -->
+    <section class="cool-places-section">
+      <div class="cool-places-sidebar">
+        <h3>Cool Places</h3>
+        <p>Check out some of our favorite ROBLOX places!</p>
+      </div>
+      <div class="places-grid">
+        <div class="place-card"><img src="public/load/place1.png" alt="Place 1"></div>
+        <div class="place-card"><img src="public/load/place2.png" alt="Place 2"></div>
+        <div class="place-card"><img src="public/load/place3.png" alt="Place 3"></div>
+        <div class="place-card"><img src="public/load/place4.png" alt="Place 4"></div>
+        <div class="place-card"><img src="public/load/place5.png" alt="Place 5"></div>
+      </div>
+    </section>
+
+    <!-- Rodapé -->
+    <footer class="footer">
+      <p>ROBLOX, "Online Building Toy", characters, logos, names, and all related indicia are trademarks of <a href="#">ROBLOX Corporation</a>, ©2008. Patents pending.</p>
+      <p>ROBLOX Corp. is not affiliated with Lego, MegaBloks, Bionicle, Pokemon, Nintendo, Lincoln Logs, Yu Gi Oh, K'Nex, Tinkertoys, Erector Set, or the Pirates of the Caribbean. ARrrr!</p>
+      <p>Use of this site signifies your acceptance of the <a href="#">Terms and Conditions</a>.</p>
+      <div class="footer-links">
+        <a href="#">Privacy Policy</a> |
+        <a href="#">Contact Us</a> |
+        <a href="#">About Us</a> |
+        <a href="#">Jobs</a>
+      </div>
+    </footer>
+
+  </div>
+
+</body>
+</html>

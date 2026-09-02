@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>ROBLOX Client</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+    }
+
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #000;
+    }
+
+    /* Container principal da viewport */
+    #game-viewport {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #000;
+    }
+
+    /* Imagem de fundo do Mapa */
+    .map-background {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 1;
+    }
+
+    /* Personagem móvel */
+    .player-avatar {
+      position: absolute;
+      width: 120px;
+      height: auto;
+      z-index: 2;
+      pointer-events: none;
+      transform: translate(-50%, -50%); /* Centraliza o ponto de ancoragem */
+    }
+
+    /* Top Bar Clássica */
+    .top-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 24px;
+      background: rgba(0, 0, 0, 0.4);
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      gap: 20px;
+      color: #ccc;
+      font-size: 11px;
+      z-index: 10;
+    }
+
+    .top-bar button {
+      background: none;
+      border: none;
+      color: #ccc;
+      cursor: pointer;
+      font-size: 11px;
+    }
+
+    .top-bar button:hover {
+      color: #fff;
+    }
+
+    /* Player List / Leaderboard */
+    .player-list {
+      position: absolute;
+      top: 30px;
+      right: 10px;
+      width: 140px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: #fff;
+      font-size: 11px;
+      padding: 4px;
+      z-index: 10;
+    }
+
+    .player-list-header {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+      padding-bottom: 2px;
+      margin-bottom: 4px;
+      font-weight: bold;
+    }
+
+    .player-name {
+      color: #ffcc00;
+    }
+
+    /* Barra de Saúde (Health) */
+    .health-container {
+      position: absolute;
+      right: 20px;
+      top: 160px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #fff;
+      font-size: 11px;
+      z-index: 10;
+    }
+
+    .health-bar-bg {
+      width: 8px;
+      height: 90px;
+      background: #222;
+      border: 1px solid #777;
+      margin-bottom: 4px;
+      position: relative;
+    }
+
+    .health-bar-fill {
+      width: 100%;
+      height: 85%;
+      background: #73c83b;
+      position: absolute;
+      bottom: 0;
+    }
+
+    /* Botão Report no canto inferior direito */
+    .bottom-right-ui {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      z-index: 10;
+    }
+
+    .report-btn {
+      background: #e1e1e1;
+      border: 1px solid #000;
+      font-size: 10px;
+      padding: 2px 6px;
+      cursor: pointer;
+    }
+
+    /* =======================================
+       CONTROLES TOUCH (MOBILE / TABLET)
+    ======================================= */
+    .mobile-controls {
+      display: none; /* Ativado via JS se detectar mobile */
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      z-index: 20;
+      pointer-events: none;
+    }
+
+    /* Joystick virtual (Canto Inferior Esquerdo) */
+    .joystick-container {
+      position: absolute;
+      bottom: 25px;
+      left: 25px;
+      width: 120px;
+      height: 120px;
+      background: rgba(0, 0, 0, 0.25);
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      border-radius: 50%;
+      pointer-events: auto;
+      touch-action: none;
+    }
+
+    .joystick-thumb {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 50px;
+      height: 50px;
+      background: rgba(255, 255, 255, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    /* Botão de Pulo (Canto Inferior Direito) */
+    .jump-btn {
+      position: absolute;
+      bottom: 35px;
+      right: 70px;
+      width: 70px;
+      height: 70px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 2px solid rgba(255, 255, 255, 0.5);
+      border-radius: 50%;
+      color: #fff;
+      font-weight: bold;
+      font-size: 14px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      pointer-events: auto;
+      touch-action: manipulation;
+    }
+
+    .jump-btn:active {
+      background: rgba(255, 255, 255, 0.4);
+    }
+  </style>
+</head>
+<body>
+
+  <div id="game-viewport">
+    
+    <!-- Imagem de fundo do Mapa -->
+    <img id="map-img" class="map-background" src="" alt="Map Background">
+
+    <!-- Top UI -->
+    <div class="top-bar">
+      <button>Help</button>
+      <button onclick="toggleFullscreen()">x Fullscreen</button>
+      <button onclick="window.location.href='games.html'">Exit</button>
+    </div>
+
+    <!-- Lista de Jogadores -->
+    <div class="player-list">
+      <div class="player-list-header">Player List</div>
+      <div class="player-name">Player1</div>
+    </div>
+
+    <!-- Barra de Vida -->
+    <div class="health-container">
+      <div class="health-bar-bg">
+        <div class="health-bar-fill"></div>
+      </div>
+      <span>Health</span>
+    </div>
+
+    <!-- Boneco do Personagem -->
+    <img id="player-img" class="player-avatar" src="/public/user.png" alt="Player">
+
+    <!-- Botão Report -->
+    <div class="bottom-right-ui" id="report-container">
+      <button class="report-btn">Report</button>
+    </div>
+
+    <!-- Overlay dos Controles Touch Mobile -->
+    <div id="mobile-overlay" class="mobile-controls">
+      <div id="joystick" class="joystick-container">
+        <div id="joystick-thumb" class="joystick-thumb"></div>
+      </div>
+      <div id="jump-btn" class="jump-btn">Jump</div>
+    </div>
+
+  </div>
+
+  <script>
+    // 1. Carregar imagem do mapa dinamicamente
+    const urlParams = new URLSearchParams(window.location.search);
+    const gameId = urlParams.get('id') || '1';
+    const mapImg = document.getElementById('map-img');
+    mapImg.src = `/public/map/${gameId}/map.png`;
+
+    // 2. Sistema de Movimentação do Personagem
+    const player = document.getElementById('player-img');
+    
+    let posX = window.innerWidth / 2;
+    let posY = window.innerHeight / 2 + 50;
+    let playerWidth = 120;
+    let jumpOffsetY = 0;
+    let isJumping = false;
+    let jumpVelocity = 0;
+    const speed = 5;
+
+    // Vetor de movimento para o joystick/teclado (-1 a 1)
+    let moveDir = { x: 0, y: 0 };
+
+    // Teclado (PC)
+    const keys = {
+      w: false, a: false, s: false, d: false,
+      ArrowUp: false, ArrowLeft: false, ArrowDown: false, ArrowRight: false
+    };
+
+    window.addEventListener('keydown', (e) => {
+      if (keys.hasOwnProperty(e.key)) keys[e.key] = true;
+      if (e.key === ' ' || e.key === 'Spacebar') triggerJump();
+    });
+
+    window.addEventListener('keyup', (e) => {
+      if (keys.hasOwnProperty(e.key)) keys[e.key] = false;
+    });
+
+    function triggerJump() {
+      if (!isJumping) {
+        isJumping = true;
+        jumpVelocity = 12;
+      }
+    }
+
+    // 3. Detecção de Mobile / Tablet & Lógica Touch
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
+                    || (navigator.maxTouchPoints && navigator.maxTouchPoints > 0);
+
+    const mobileOverlay = document.getElementById('mobile-overlay');
+
+    if (isMobile) {
+      mobileOverlay.style.display = 'block';
+
+      // Ajusta posição do botão report no mobile para não sobrepor o botão de pular
+      document.getElementById('report-container').style.bottom = '110px';
+
+      const joystick = document.getElementById('joystick');
+      const thumb = document.getElementById('joystick-thumb');
+      const jumpBtn = document.getElementById('jump-btn');
+
+      let joystickActive = false;
+      let touchId = null;
+      const radius = 60; // Metade da largura da base do joystick
+
+      function handleTouchStart(e) {
+        for (let i = 0; i < e.changedTouches.length; i++) {
+          const touch = e.changedTouches[i];
+          const rect = joystick.getBoundingClientRect();
+          const centerX = rect.left + rect.width / 2;
+          const centerY = rect.top + rect.height / 2;
+          const dist = Math.hypot(touch.clientX - centerX, touch.clientY - centerY);
+
+          if (dist <= radius + 20 && touchId === null) {
+            touchId = touch.identifier;
+            joystickActive = true;
+            updateJoystick(touch, centerX, centerY);
+          }
+        }
+      }
+
+      function handleTouchMove(e) {
+        if (!joystickActive) return;
+        for (let i = 0; i < e.touches.length; i++) {
+          if (e.touches[i].identifier === touchId) {
+            const rect = joystick.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            updateJoystick(e.touches[i], centerX, centerY);
+          }
+        }
+      }
+
+      function handleTouchEnd(e) {
+        for (let i = 0; i < e.changedTouches.length; i++) {
+          if (e.changedTouches[i].identifier === touchId) {
+            touchId = null;
+            joystickActive = false;
+            thumb.style.transform = `translate(-50%, -50%)`;
+            moveDir.x = 0;
+            moveDir.y = 0;
+          }
+        }
+      }
+
+      function updateJoystick(touch, centerX, centerY) {
+        let dx = touch.clientX - centerX;
+        let dy = touch.clientY - centerY;
+        let dist = Math.hypot(dx, dy);
+
+        if (dist > radius) {
+          dx = (dx / dist) * radius;
+          dy = (dy / dist) * radius;
+        }
+
+        thumb.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
+
+        // Normaliza valores de movimento entre -1 e 1
+        moveDir.x = dx / radius;
+        moveDir.y = dy / radius;
+      }
+
+      joystick.addEventListener('touchstart', handleTouchStart, { passive: false });
+      window.addEventListener('touchmove', handleTouchMove, { passive: false });
+      window.addEventListener('touchend', handleTouchEnd);
+      window.addEventListener('touchcancel', handleTouchEnd);
+
+      jumpBtn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        triggerJump();
+      });
+    }
+
+    // 4. Game Loop Principal (60 FPS)
+    function gameLoop() {
+      // Movimentação via Teclado se não estiver usando Touch
+      let dirX = moveDir.x;
+      let dirY = moveDir.y;
+
+      if (!isMobile || (dirX === 0 && dirY === 0)) {
+        if (keys.a || keys.ArrowLeft) dirX = -1;
+        if (keys.d || keys.ArrowRight) dirX = 1;
+        if (keys.w || keys.ArrowUp) dirY = -1;
+        if (keys.s || keys.ArrowDown) dirY = 1;
+      }
+
+      // Aplicar Posição Horizontal
+      posX += dirX * speed;
+
+      // Aplicar Posição Vertical + Escala (Efeito de profundidade)
+      if (dirY < 0) {
+        posY -= speed;
+        playerWidth = Math.max(60, playerWidth - 0.5);
+      } else if (dirY > 0) {
+        posY += speed;
+        playerWidth = Math.min(200, playerWidth + 0.5);
+      }
+
+      // Lógica de Pulo
+      if (isJumping) {
+        jumpOffsetY += jumpVelocity;
+        jumpVelocity -= 0.8; // Gravidade
+        if (jumpOffsetY <= 0) {
+          jumpOffsetY = 0;
+          isJumping = false;
+        }
+      }
+
+      // Limite das bordas da tela
+      posX = Math.max(50, Math.min(window.innerWidth - 50, posX));
+      posY = Math.max(100, Math.min(window.innerHeight - 50, posY));
+
+      // Atualiza estilos do elemento
+      player.style.left = `${posX}px`;
+      player.style.top = `${posY - jumpOffsetY}px`;
+      player.style.width = `${playerWidth}px`;
+
+      requestAnimationFrame(gameLoop);
+    }
+
+    gameLoop();
+
+    // Alternar Tela Cheia
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+      } else if (document.exitFullscreen) {
+        document.exitFullscreen();
+      }
+    }
+  </script>
+
+</body>
+</html>

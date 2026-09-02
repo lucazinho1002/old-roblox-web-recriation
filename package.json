@@ -1,0 +1,14 @@
+{
+  "name": "oldblox-web",
+  "description": "the old roblox 2008 recriated on html and js and css",
+  "version": "0.1.2",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "latest"
+  }
+}
