@@ -8,5 +8,35 @@
     "played": 1,
     "online": 0,
     "description": "test"
+  },
+  {
+    "id": "2",
+    "title": "encrusilhada v0.1",
+    "creator": "Lucazinho1002",
+    "updated": "2026-09-02",
+    "favorited": 0,
+    "played": 0,
+    "online": 0,
+    "description": "Jogo criado no Editor."
+  },
+  {
+    "id": "3",
+    "title": "mar",
+    "creator": "Lucazinho1002",
+    "updated": "2026-09-02",
+    "favorited": 0,
+    "played": 0,
+    "online": 0,
+    "description": "Jogo criado no Editor."
+  },
+  {
+    "id": "4",
+    "title": "homem",
+    "creator": "Lucazinho1002",
+    "updated": "2026-09-02",
+    "favorited": 0,
+    "played": 0,
+    "online": 0,
+    "description": "Jogo criado no Editor."
   }
 ]

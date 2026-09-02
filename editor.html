@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>studio</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Tahoma', 'Arial', sans-serif;
+      user-select: none;
+    }
+
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #ece9d8;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Barra de Menu do Windows com Dropdowns */
+    .menu-bar {
+      background: #ece9d8;
+      border-bottom: 1px solid #999;
+      display: flex;
+      padding: 2px 5px;
+      font-size: 11px;
+      position: relative;
+      z-index: 50;
+    }
+
+    .menu-item {
+      padding: 2px 8px;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .menu-item:hover {
+      background: #316ac5;
+      color: #fff;
+    }
+
+    /* Menus Dropdown */
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background-color: #fff;
+      min-width: 140px;
+      box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+      border: 1px solid #999;
+      z-index: 100;
+    }
+
+    .dropdown-content button {
+      color: #000;
+      padding: 4px 10px;
+      text-decoration: none;
+      display: block;
+      width: 100%;
+      text-align: left;
+      background: none;
+      border: none;
+      font-size: 11px;
+      cursor: pointer;
+    }
+
+    .dropdown-content button:hover {
+      background-color: #316ac5;
+      color: white;
+    }
+
+    .menu-item:hover .dropdown-content {
+      display: block;
+    }
+
+    /* Submenu de Cores */
+    .nested-dropdown {
+      position: relative;
+    }
+
+    .nested-dropdown .sub-menu {
+      display: none;
+      position: absolute;
+      left: 100%;
+      top: 0;
+      background-color: #fff;
+      border: 1px solid #999;
+      box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+      min-width: 130px;
+    }
+
+    .nested-dropdown:hover .sub-menu {
+      display: block;
+    }
+
+    .color-btn-item {
+      display: flex !important;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .color-box {
+      width: 12px;
+      height: 12px;
+      border: 1px solid #000;
+      display: inline-block;
+    }
+
+    /* Barra de Ferramentas */
+    .toolbar {
+      background: #f0ede0;
+      border-bottom: 1px solid #999;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 6px;
+      font-size: 12px;
+    }
+
+    .tool-btn {
+      padding: 3px 8px;
+      border: 1px solid #7f9db9;
+      background: #e3e3e3;
+      cursor: pointer;
+      font-size: 11px;
+      border-radius: 2px;
+    }
+
+    .tool-btn:hover { background: #fff; }
+    .tool-btn.active { background: #b5d5ff; border-color: #316ac5; }
+
+    /* Área Principal */
+    .workspace-container {
+      display: flex;
+      flex: 1;
+      height: calc(100vh - 55px);
+    }
+
+    .viewport {
+      flex: 1;
+      background: #111;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    canvas {
+      border: 1px solid #444;
+      cursor: crosshair;
+    }
+
+    /* Painel Lateral */
+    .sidebar {
+      width: 220px;
+      background: #f4f4f4;
+      border-left: 1px solid #999;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .panel {
+      border-bottom: 1px solid #ccc;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .panel-header {
+      background: #0055ea;
+      color: #fff;
+      font-size: 11px;
+      font-weight: bold;
+      padding: 3px 6px;
+    }
+
+    .panel-content {
+      padding: 6px;
+      font-size: 11px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .explorer-tree { list-style: none; }
+    .explorer-tree li { padding: 2px 4px; cursor: pointer; }
+    .explorer-tree li:hover { background: #316ac5; color: #fff; }
+
+    .properties-table { width: 100%; border-collapse: collapse; }
+    .properties-table td { border: 1px solid #ddd; padding: 3px; }
+
+    /* Modal de Salvamento */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #fff;
+      border: 2px solid #316ac5;
+      padding: 15px;
+      z-index: 100;
+      box-shadow: 3px 3px 10px rgba(0,0,0,0.5);
+      width: 320px;
+      font-size: 12px;
+    }
+
+    .modal input { width: 100%; margin: 6px 0 12px 0; padding: 4px; }
+    .modal button { padding: 4px 10px; cursor: pointer; }
+  </style>
+</head>
+<body>
+
+  <div class="menu-bar">
+    
+    <div class="menu-item">
+      File
+      <div class="dropdown-content">
+        <button onclick="openSaveModal()">Save to ROBLOX</button>
+      </div>
+    </div>
+
+    <div class="menu-item">Edit</div>
+    <div class="menu-item">View</div>
+
+    <div class="menu-item">
+      Object
+      <div class="dropdown-content">
+        <button onclick="setTool('part')">Part</button>
+        <button onclick="setTool('spawn')">SpawnLocation</button>
+      </div>
+    </div>
+
+    <div class="menu-item">
+      Tools
+      <div class="dropdown-content">
+        <div class="nested-dropdown">
+          <button style="display:flex; justify-shadow:space-between; align-items:center;">
+            <span>Colors</span> ▶
+          </button>
+          <div class="sub-menu">
+            <button class="color-btn-item" onclick="selectColor('#a0a0a0')"><span class="color-box" style="background:#a0a0a0;"></span> Medium Stone Grey</button>
+            <button class="color-btn-item" onclick="selectColor('#48a048')"><span class="color-box" style="background:#48a048;"></span> Bright Green (Grama)</button>
+            <button class="color-btn-item" onclick="selectColor('#cd5c5c')"><span class="color-box" style="background:#cd5c5c;"></span> Bright Red</button>
+            <button class="color-btn-item" onclick="selectColor('#0d69ab')"><span class="color-box" style="background:#0d69ab;"></span> Bright Blue</button>
+            <button class="color-btn-item" onclick="selectColor('#f5cd2f')"><span class="color-box" style="background:#f5cd2f;"></span> Bright Yellow</button>
+            <button class="color-btn-item" onclick="selectColor('#f2f3f3')"><span class="color-box" style="background:#f2f3f3;"></span> White</button>
+            <button class="color-btn-item" onclick="selectColor('#1b2a35')"><span class="color-box" style="background:#1b2a35;"></span> Black</button>
+            <button class="color-btn-item" onclick="selectColor('#da8541')"><span class="color-box" style="background:#da8541;"></span> Bright Orange</button>
+            <button class="color-btn-item" onclick="selectColor('#aa5500')"><span class="color-box" style="background:#aa5500;"></span> Dark Orange (Madeira)</button>
+            <button class="color-btn-item" onclick="selectColor('#ff69b4')"><span class="color-box" style="background:#ff69b4;"></span> Hot Pink</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="menu-item">Help</div>
+  </div>
+
+  <div class="toolbar">
+    <button class="tool-btn active" id="tool-select" onclick="setTool('select')">Select</button>
+    <button class="tool-btn" id="tool-paint" onclick="setTool('paint')" style="display:none;">🎨 Paint (Cor selecionada)</button>
+    <button class="tool-btn" onclick="clearCanvas()">Clear All</button>
+  </div>
+
+  <div class="workspace-container">
+    <div class="viewport">
+      <canvas id="mapCanvas" width="800" height="600"></canvas>
+    </div>
+
+    <div class="sidebar">
+      <div class="panel" style="flex: 1;">
+        <div class="panel-header">Explorer</div>
+        <div class="panel-content">
+          <ul class="explorer-tree">
+            <li>📁 Workspace</li>
+            <li style="padding-left: 12px;">🟩 Baseplate</li>
+            <div id="explorer-objects"></div>
+          </ul>
+        </div>
+      </div>
+
+      <div class="panel" style="flex: 1;">
+        <div class="panel-header">Properties</div>
+        <div class="panel-content">
+          <table class="properties-table">
+            <tr><td><b>Name</b></td><td id="prop-name">Workspace</td></tr>
+            <tr><td><b>Base Color</b></td><td id="prop-color">#48a048</td></tr>
+            <tr><td><b>Parts</b></td><td id="prop-count">0</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="saveModal" class="modal">
+    <h3>Save to ROBLOX</h3>
+    
+    <label style="margin-top:8px; display:block;">Nome do Jogo:</label>
+    <input type="text" id="gameNameInput" value="Meu Mapa Criado">
+
+    <label>ID do Jogo:</label>
+    <input type="number" id="gameIdInput" value="2">
+
+    <button onclick="saveGameToServer()">Salvar</button>
+    <button onclick="closeSaveModal()">Cancelar</button>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('mapCanvas');
+    const ctx = canvas.getContext('2d');
+
+    let currentTool = 'select';
+    let selectedColor = '#cd5c5c'; // Cor padrão ao ativar a pintura
+    let baseplateColor = '#48a048'; // Cor padrão da grama
+    let parts = [];
+
+    function setTool(tool) {
+      currentTool = tool;
+      document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+      if(document.getElementById(`tool-${tool}`)) {
+        document.getElementById(`tool-${tool}`).classList.add('active');
+      }
+    }
+
+    function selectColor(hexColor) {
+      selectedColor = hexColor;
+      const paintBtn = document.getElementById('tool-paint');
+      paintBtn.style.display = 'inline-block';
+      paintBtn.style.borderLeft = `8px solid ${hexColor}`;
+      setTool('paint');
+    }
+
+    function drawMap() {
+      // Desenha a Baseplate com a cor atual
+      ctx.fillStyle = baseplateColor;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Grade (Studs)
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.08)';
+      ctx.lineWidth = 1;
+      for (let x = 0; x < canvas.width; x += 20) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+      }
+      for (let y = 0; y < canvas.height; y += 20) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+      }
+
+      // Desenha as partes
+      parts.forEach((p) => {
+        ctx.fillStyle = p.color;
+        ctx.fillRect(p.x, p.y, p.w, p.h);
+        ctx.strokeStyle = '#000';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(p.x, p.y, p.w, p.h);
+
+        if(p.type === 'spawn') {
+          ctx.fillStyle = '#fff';
+          ctx.beginPath();
+          ctx.arc(p.x + p.w/2, p.y + p.h/2, 10, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      });
+
+      updateUI();
+    }
+
+    // Clique no Canvas
+    canvas.addEventListener('mousedown', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+
+      if (currentTool === 'part') {
+        parts.push({ type: 'part', x: mouseX - 25, y: mouseY - 25, w: 50, h: 50, color: '#a0a0a0' });
+        drawMap();
+      } else if (currentTool === 'spawn') {
+        parts.push({ type: 'spawn', x: mouseX - 30, y: mouseY - 30, w: 60, h: 60, color: '#808080' });
+        drawMap();
+      } else if (currentTool === 'paint') {
+        // Tenta colorir alguma part em que o usuário clicou (da última criada para a primeira)
+        let hitPart = false;
+        for (let i = parts.length - 1; i >= 0; i--) {
+          const p = parts[i];
+          if (mouseX >= p.x && mouseX <= p.x + p.w && mouseY >= p.y && mouseY <= p.y + p.h) {
+            p.color = selectedColor;
+            hitPart = true;
+            break;
+          }
+        }
+
+        // Se não clicou em nenhuma Part, colore a Baseplate!
+        if (!hitPart) {
+          baseplateColor = selectedColor;
+        }
+
+        drawMap();
+      }
+    });
+
+    function clearCanvas() {
+      parts = [];
+      baseplateColor = '#48a048';
+      drawMap();
+    }
+
+    function updateUI() {
+      const explorer = document.getElementById('explorer-objects');
+      explorer.innerHTML = '';
+      parts.forEach((p, i) => {
+        const li = document.createElement('li');
+        li.style.paddingLeft = '12px';
+        li.innerText = `📦 ${p.type === 'spawn' ? 'SpawnLocation' : 'Part'} ${i + 1}`;
+        explorer.appendChild(li);
+      });
+
+      document.getElementById('prop-count').innerText = parts.length;
+      document.getElementById('prop-color').innerText = baseplateColor;
+    }
+
+    function openSaveModal() { document.getElementById('saveModal').style.display = 'block'; }
+    function closeSaveModal() { document.getElementById('saveModal').style.display = 'none'; }
+
+    async function saveGameToServer() {
+      const gameId = document.getElementById('gameIdInput').value || '2';
+      const gameName = document.getElementById('gameNameInput').value || 'Jogo Criado';
+      const imageData = canvas.toDataURL("image/png");
+
+      try {
+        const res = await fetch('/api/save-game', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: gameId, name: gameName, imageData })
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          alert(`Jogo "${gameName}" guardado com sucesso no ROBLOX!`);
+          closeSaveModal();
+        } else {
+          alert('Erro ao salvar: ' + data.error);
+        }
+      } catch (err) {
+        alert('Erro na requisição: ' + err.message);
+      }
+    }
+
+    drawMap();
+  </script>
+
+</body>
+</html>
