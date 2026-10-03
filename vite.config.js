@@ -3,6 +3,7 @@ import fs from 'fs';
 import path from 'path';
 
 export default defineConfig({
+  base: '/old-roblox-web-recriation/',
   plugins: [
     {
       name: 'save-game-api',
