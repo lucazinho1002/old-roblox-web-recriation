@@ -3,3 +3,4 @@
 ## coisas e coisos
 prefiro que abra no palemoon se for testar no pc pois o swf e o som só funciona lá não sei o pq.
 o W.I.P que esta escrito significa que ainda esta sendo construído, como pode ver.
+coloquei no site [oldrobloxweb.duckdns.org/](oldrobloxweb.duckdns.org/) para poderem testar sem ter que rodar no seu pc/celular.
